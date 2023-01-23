@@ -1,41 +1,31 @@
 <?php
-$dom = new DOMDocument();
-$dom->load('data/data.xml');
-$products = $dom->getElementsByTagName('products')->item(0);
-$product=$products->getElementsByTagName('product');
-$index = $product->length;
-if ($index != 0) {
-    $id=$product[$index-1]->getElementsByTagName('id')->item(0)->nodeValue+1;
-} else {
-    $id = 1;
+$connection = mysqli_connect('127.0.0.1',  'root', '', 'task');
+
+if (!$connection) {
+    echo 'Не удалось подключиться к БД';
+    echo mysqli_connect_error();
+    exit();
 }
+
 
 if(isset($_POST['sbm'])){
     $task = $_POST['task'];
     $deadline = $_POST['deadline'];
-    $new_prd = $dom->createElement('product');
 
-    $node_id = $dom->createElement('id', $id);
-    $new_prd->appendChild($node_id);
-
-    $node_task = $dom->createElement('task', $task);
-    $new_prd->appendChild($node_task);
-
-    $node_deadline = $dom->createElement('deadline', $deadline);
-    $new_prd->appendChild($node_deadline);
-
-    $products->appendChild($new_prd);
+    $task = $_POST['task'];
+    $deadline = $_POST['deadline'];
 
     if (strlen($task) <= 2) {
         header('location: index.php?page_layout=create');
         exit("Enter task, which len more than 2");
     }
 
-    $dom->formatOutput=true;
-    $dom->save('data/data.xml')or die('Error');
-    $error = "";
+
+    $sql="INSERT INTO `task`(`task`, `deadline`) VALUES ('$task','$deadline')";
+    mysqli_query($connection, $sql);
+
     header('location: index.php?page_layout=list');
-    exit();
+    exit;
 }
 ?>
 

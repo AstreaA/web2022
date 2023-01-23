@@ -1,2 +1,2 @@
-# Web2022
-
+# WebMyPage
+connected to bd (phpadmin)

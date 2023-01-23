@@ -1,29 +1,22 @@
 <?php
+
+$connection = mysqli_connect('127.0.0.1',  'root', '', 'task');
+
+if (!$connection) {
+    echo 'Не удалось подключиться к БД';
+    echo mysqli_connect_error();
+    exit();
+}
+
 $get_id=$_GET['id'];
-$dom = new DOMDocument();
-$dom->load('data/data.xml');
-$products = $dom->getElementsByTagName('products')->item(0);
-$product=$products->getElementsByTagName('product');
-$index = $product->length;
 
 if(isset($_POST['sbm'])){
     $task = $_POST['task'];
     $deadline = $_POST['deadline'];
-    $new_prd = $dom->createElement('product');
 
-    $node_id = $dom->createElement('id', $get_id);
-    $new_prd->appendChild($node_id);
+    $sql="UPDATE TASK SET task='$task',deadline='$deadline' WHERE id= '$get_id'";
+    mysqli_query($connection, $sql);
 
-    $node_task = $dom->createElement('task', $task);
-    $new_prd->appendChild($node_task);
-
-    $node_deadline = $dom->createElement('deadline', $deadline);
-    $new_prd->appendChild($node_deadline);
-
-    $products->replaceChild($new_prd,$product->item($get_id - 1));
-
-    $dom->formatOutput=true;
-    $dom->save('data/data.xml')or die('Error');
     header('location: index.php?page_layout=list');
     exit;
 }

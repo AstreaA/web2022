@@ -8,9 +8,15 @@
 <body>
 
 <?php
-$dom = new DOMDocument();
-$dom->load('data/data.xml');
-$products = $dom->getElementsByTagName('products')->item(0);
+$MAX_NUMBER_TASKS = 100;
+$connection = mysqli_connect('127.0.0.1',  'root', '', 'task');
+
+if (!$connection) {
+    echo 'Не удалось подключиться к БД';
+    echo mysqli_connect_error();
+    exit();
+}
+
 ?>
 
 
@@ -23,17 +29,32 @@ $products = $dom->getElementsByTagName('products')->item(0);
     </li>
     <?php
     $i = 1;
-    $product=$products->getElementsByTagName('product');
-    foreach ($product as $tmp){
+    $sql="SELECT * FROM TASK WHERE id = '$i'" ;
+    $result = mysqli_query($connection, $sql);
+    $data = mysqli_fetch_assoc($result);
+    while ($i <= $MAX_NUMBER_TASKS) {
+        if (!$data) {
+            $i++;
+            $sql="SELECT * FROM TASK WHERE id = '$i'";
+            $result = mysqli_query($connection, $sql);
+            $data = mysqli_fetch_assoc($result);
+            continue;
+        }
         ?>
         <li>
-            <a href="index.php?page_layout=update&id=<?php echo  $product->item($i-1)->getElementsByTagName('id')->item(0)->nodeValue; ?>"> <?php echo $tmp->getElementsByTagName('id')->item(0)->nodeValue?></a>
-            <a href="index.php?page_layout=update&id=<?php echo  $product->item($i-1)->getElementsByTagName('id')->item(0)->nodeValue; ?>"> <?php echo $tmp->getElementsByTagName('task')->item(0)->nodeValue?></a>
-            <a href="index.php?page_layout=update&id=<?php echo  $product->item($i-1)->getElementsByTagName('id')->item(0)->nodeValue; ?>"> <?php echo $tmp->getElementsByTagName('deadline')->item(0)->nodeValue?></a>
-            <a onclick="return Del('<?php echo $product->item($i-1)->getElementsByTagName('id')->item(0)->nodeValue;?>')" href="index.php?page_layout=delete&id=<?php echo  $product->item($i-1)->getElementsByTagName('id')->item(0)->nodeValue; ?>"> Delete </a>
+            <?php $update_link = "index.php?page_layout=update&id=". $data["id"];
+            $delete_link = "index.php?page_layout=delete&id=". $data["id"];
+            ?>
+            <a href=<?php echo $update_link;?> > <?php echo $data["id"];?></a>
+            <a href=<?php echo $update_link;?>> <?php echo $data["task"];?></a>
+            <a href=<?php echo $update_link;?>> <?php echo $data["deadline"];?></a>
+            <a onclick="return Del(<?php echo $data["id"];?>)" href=<?php echo $delete_link;?> > Delete </a>
         </li>
         <?php
         $i++;
+        $sql="SELECT * FROM TASK WHERE id = '$i'";
+        $result = mysqli_query($connection, $sql);
+        $data = mysqli_fetch_assoc($result);
     } ?>
 </ul>
 

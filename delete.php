@@ -1,21 +1,16 @@
-<?php $id = $_GET['id'];
-$dom = new DOMDocument();
-$dom->load('data/data.xml');
-$products = $dom->getElementsByTagName('products')->item(0);
-$product=$products->getElementsByTagName('product');
+<?php $get_id = $_GET['id'];
 
-$i=0;
-while (is_object($product->item($i++))){
-    $prd=$product->item($i-1)->getElementsByTagName('id')->item(0);
-    $prd_id= $prd->nodeValue;
-    if( $prd_id== $id){
-        $products->removeChild($product->item($i-1));
-        break;
-    }
+$connection = mysqli_connect('127.0.0.1',  'root', '', 'task');
+
+if (!$connection) {
+    echo 'Не удалось подключиться к БД';
+    echo mysqli_connect_error();
+    exit();
 }
 
-$dom->formatOutput=true;
-$dom->save('data/data.xml')or die('Error');
+$sql="DELETE FROM TASK WHERE id = '$get_id'";
+mysqli_query($connection, $sql);
+
 header('location: index.php?page_layout=list');
 exit;
 ?>
